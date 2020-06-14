@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc_web.dart';
+import 'demo_bank.pbgrpc.dart';
 
 void main() {
   runApp(MyApp());
 }
+
+Future<Dashboard> getDashboard(String loginName) async {
+  final channel = GrpcWebClientChannel.xhr(Uri.parse('http://192.168.39.44:32413'));
+  final client = DashboardServiceClient(channel);
+  return (await client.getDashboard(GetDashboardRequest()..loginName = loginName));
+}
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Bank App',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,7 +35,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Banking Demo App Home'),
     );
   }
 }
@@ -50,9 +59,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Dashboard _myDashboard;
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
+    Dashboard dashboard = await getDashboard('10001000');
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -60,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      _myDashboard = dashboard;
     });
   }
 
@@ -102,6 +114,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(
               '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            Text(
+              '$_myDashboard.account.nickname',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
