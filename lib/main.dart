@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc_web.dart';
 import 'demo_bank.pbgrpc.dart';
@@ -10,11 +8,11 @@ void main() {
 }
 
 Future<Dashboard> getDashboard(String loginName) async {
-  final channel = GrpcWebClientChannel.xhr(Uri.parse('http://192.168.39.44:32413'));
+  final channel = GrpcWebClientChannel.xhr(Uri.parse('http://35.196.128.241'));
   final client = DashboardServiceClient(channel);
-  return (await client.getDashboard(GetDashboardRequest()..loginName = loginName));
+  return (await client
+      .getDashboard(GetDashboardRequest()..loginName = loginName));
 }
-
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -66,6 +64,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called
+    List<Widget> accountDetail = [];
+    if (_myDashboard != null) {
+      CasaAccount acc = _myDashboard.casa[0];
+      accountDetail.add(Text(
+        acc.nickname,
+        style: Theme.of(context).textTheme.headline4,
+      ));
+      accountDetail.add(Text(
+        acc.prodName,
+        style: Theme.of(context).textTheme.headline4,
+      ));
+      accountDetail.add(Text(
+        'Balance: ${acc.balances[0].amount} ${acc.currency}',
+        style: Theme.of(context).textTheme.headline4,
+      ));
+    }
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -95,10 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'My Dashboard',
             ),
-            Text(
-              'Hello ${_myDashboard?.customer?.name ?? ''}',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            ...accountDetail
           ],
         ),
       ),
