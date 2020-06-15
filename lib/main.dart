@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc_web.dart';
 import 'demo_bank.pbgrpc.dart';
+import 'bank_client.dart';
 import 'dart:developer' as developer;
 
 void main() {
   runApp(MyApp());
-}
-
-Future<Dashboard> getDashboard(String loginName) async {
-  final channel = GrpcWebClientChannel.xhr(Uri.parse('http://35.196.128.241'));
-  final client = DashboardServiceClient(channel);
-  return (await client
-      .getDashboard(GetDashboardRequest()..loginName = loginName));
 }
 
 class MyApp extends StatelessWidget {
@@ -55,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Dashboard _myDashboard;
 
   void _getMyDashboard() async {
-    Dashboard dashboard = await getDashboard('10001000');
+    Dashboard dashboard = await BankApiClient.getDashboard('10001000');
     setState(() {
       _myDashboard = dashboard;
     });
